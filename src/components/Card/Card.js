@@ -1,4 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { ItemTypes } from '../../constants';
+import { DragSource } from 'react-dnd';
 import styled from 'styled-components';
 
 const Card = styled.div`
@@ -15,7 +18,7 @@ const Card = styled.div`
   &:hover {
     box-shadow: 0 5px 1px #f5eaea;
     transform: translateY(-3px);
-  }
+  } 
 `;
 const CardContent = styled.div`
   text-align: left;
@@ -43,14 +46,28 @@ const Rating = styled.span``;
 const Time = styled.span``;
 const Comment = styled.span``;
 
-// {userName, userImg, userRating, registerTime, comment}
+const cardSource = {
+  beginDrag(props) {
+    return {
+      name: props.name
+    };
+  }
+};
 
-const card = (props) => {
+function collect(connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging()
+  }
+}
+
+// {userName, userImg, userRating, registerTime, comment}
+const card = ({isDragging, connectDragSource, name}) => {
   return (
-    <Card>
+    <Card style={{ opacity: isDragging ? 0.5 : 1 }}>
       <Thumbnail src="http://placehold.it/50x50" alt=""/>
       <CardContent>
-        <Title>Candidate Name</Title>
+        <Title>{name}</Title>
         <MetaData>
           <Rating>4.0</Rating>
           <Time>17d</Time>
@@ -59,6 +76,15 @@ const card = (props) => {
       </CardContent>
     </Card>
   )
+};
+
+
+card.propTypes = {
+  name: PropTypes.string.isRequired,
+
+  // Injected by React DnD:
+  connectDragSource: PropTypes.func.isRequired,
+  isDragging: PropTypes.bool.isRequired
 };
 
 export default card;
